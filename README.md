@@ -1,41 +1,67 @@
-# Montage Vidéo Automatisé avec IA
+# AI Video Highlight Generator
 
-Ce projet permet de créer automatiquement une version raccourcie d'une vidéo en sélectionnant les meilleurs moments grâce à l'IA.
+This project automatically creates a shortened version of a video by selecting the best moments using AI.
 
-## Prérequis
+## Prerequisites
 
-- Python 3.8 ou supérieur
-- Une clé API OpenAI
+- Python 3.8 or higher
+- An OpenAI API key
+- FFmpeg (required for video processing)
+
+### Installing FFmpeg
+
+#### Windows:
+1. Download FFmpeg from https://ffmpeg.org/download.html
+2. Extract the downloaded zip file
+3. Add the `bin` folder to your system PATH:
+   - Open System Properties > Advanced > Environment Variables
+   - Under "System Variables", find and select "Path"
+   - Click "Edit" and add the path to the FFmpeg bin folder
+   - Click "OK" to save changes
+
+#### Linux:
+```bash
+sudo apt update
+sudo apt install ffmpeg
+```
 
 ## Installation
 
-1. Clonez ce dépôt
-2. Installez les dépendances :
+1. Clone this repository
+2. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
-3. Créez un fichier `.env` et ajoutez votre clé API OpenAI :
+3. Create a `.env` file and add your OpenAI API key:
 ```
-OPENAI_API_KEY=votre_clé_api_ici
+OPENAI_API_KEY=your_api_key_here
 ```
 
-## Utilisation
+## Usage
 
-1. Placez votre vidéo dans le dossier du projet et renommez-la en `input_video.mp4` (ou modifiez le chemin dans le code)
-2. Exécutez le script :
+1. Place your video in the project directory and rename it to `test.mp4` (or modify the path in the code)
+2. Run the script:
+
+#### Windows:
 ```bash
 python video_editor.py
 ```
 
-Le script va :
-1. Transcrire la vidéo avec Whisper
-2. Envoyer le transcript à GPT-4 pour sélectionner les meilleurs moments
-3. Créer une nouvelle vidéo avec uniquement ces moments
+#### Linux:
+```bash
+python3 video_editor.py
+```
 
-La vidéo finale sera sauvegardée sous le nom `highlight_video.mp4`
+The script will:
+1. Transcribe the video using Whisper
+2. Send the transcript to GPT-4 to select the best moments
+3. Create a new video containing only these moments
+
+The final video will be saved as `highlight_video.mp4`
 
 ## Notes
 
-- Le modèle Whisper utilisé est "base" pour des performances rapides. Vous pouvez le changer pour "small" ou "medium" pour une meilleure précision
-- Le processus peut prendre du temps selon la longueur de la vidéo
-- Assurez-vous d'avoir suffisamment d'espace disque pour les fichiers temporaires 
+- The Whisper model used is "base" for faster performance. You can change it to "small" or "medium" for better accuracy
+- The process may take some time depending on the video length
+- Make sure you have enough disk space for temporary files
+- For Windows users: If you encounter any FFmpeg-related errors, ensure FFmpeg is properly installed and added to your PATH 

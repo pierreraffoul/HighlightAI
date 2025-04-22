@@ -1,13 +1,12 @@
 import whisper
-import openai
 import os
 from moviepy.editor import VideoFileClip, concatenate_videoclips
 from dotenv import load_dotenv
+from openai import OpenAI
 
 def load_environment():
     """Charge les variables d'environnement depuis le fichier .env"""
     load_dotenv()
-    openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def transcribe_video(video_path):
     """Transcrit la vidéo et retourne les segments avec timestamps"""
@@ -27,7 +26,13 @@ def format_transcript_for_gpt(segments):
 def get_best_moments(transcript):
     """Envoie le transcript à GPT pour sélectionner les meilleurs moments"""
     prompt = f"""
-    Voici le transcript d'une vidéo avec les timestamps. Ta tâche est d'en sélectionner uniquement les meilleurs moments (les plus intéressants, drôles, percutants, ou émotionnels). Renvoie uniquement une liste de timestamps [start, end] des moments choisis.
+    Voici le transcript d'une vidéo avec ses timestamps.
+
+Voici la transcription d'une vidéo de quelqu'un qui parle pendans 1h.
+La vidéo dure 1h car la vidéo n'est pas coupée. Cependant son contenu ne devrait pas etre aussi long.
+Ton but est de couper les moments les moins intéressants afin d'avoir une vidéo fluide à regarder.
+La vidéo finale doit faire une dizaine de minutes.
+
 
     Transcript :
     {transcript}
@@ -36,12 +41,13 @@ def get_best_moments(transcript):
     [[5.0, 10.0], [45.0, 50.0], ...]
     """
 
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
+    client = OpenAI()  # Se base sur la variable OPENAI_API_KEY de l'environnement
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
         messages=[{"role": "user", "content": prompt}]
     )
 
-    return eval(response['choices'][0]['message']['content'])
+    return eval(response.choices[0].message.content)
 
 def create_highlight_video(video_path, timestamps, output_path):
     """Crée une vidéo avec uniquement les moments sélectionnés"""
@@ -53,18 +59,15 @@ def create_highlight_video(video_path, timestamps, output_path):
     print(f"Vidéo finale sauvegardée dans : {output_path}")
 
 def main():
-    # Configuration
     load_environment()
-    
-    # Chemins des fichiers
-    video_path = "input_video.mp4"  # À modifier selon votre vidéo
+
+    video_path = "LARGENT.mp4"
     output_path = "highlight_video.mp4"
-    
-    # Processus
+
     segments = transcribe_video(video_path)
     transcript = format_transcript_for_gpt(segments)
     best_moments = get_best_moments(transcript)
     create_highlight_video(video_path, best_moments, output_path)
 
 if __name__ == "__main__":
-    main() 
+    main()
